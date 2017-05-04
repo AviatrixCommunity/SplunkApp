@@ -1,0 +1,200 @@
+<dashboard>
+  <label>Overview</label>
+  <description></description>
+  <row>
+    <panel>
+      <map>
+        <title>VPN Gateway locations by number of connections</title>
+        <search>
+          <query>`aviatrix_log` AviatrixVPNSession | search Status=active | iplocation GatewayIP |
+geostats count by Region globallimit=0</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="mapping.type">marker</option>
+        <drilldown>
+          <link>
+            <![CDATA[search?q=`aviatrix_log` AviatrixVPNSession | search Status=active | iplocation GatewayIP | geostats count by Region globallimit=0]]>
+          </link>
+        </drilldown>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top 10 VPN connection duration by users</title>
+        <search>
+          <query>`aviatrix_log` | eval secs=strptime(Duration, "%H:%M:%S")-strptime("00:00:00", "%H:%M:%S") | stats sum(secs) as Time(Sec) by User |sort Time(Sec) desc limit=10</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <drilldown>
+          <link>
+            <![CDATA[search?q=`aviatrix_log` AviatrixVPNSession | search $click.name$=$click.value$ | where NOT Duration="N/A"]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Total User connection time by gateway</title>
+        <search>
+          <query>`aviatrix_log` | eval secs=strptime(Duration, "%H:%M:%S")-strptime("00:00:00", "%H:%M:%S") | stats sum(secs) as Time_Sec by Gateway</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <drilldown>
+          <link>
+            <![CDATA[search?q=`aviatrix_log` AviatrixVPNSession | search $click.name$=$click.value$ | where NOT Duration="N/A"]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Total Rx Bytes by VPN User connection</title>
+        <search>
+          <query>`aviatrix_log` | eval secs=strptime(Duration, "%H:%M:%S")-strptime("00:00:00", "%H:%M:%S") |chart sum(RXbytes) as Total_RX_Bytes by User | sort Total_RX_Bytes desc limit=10</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <drilldown>
+          <link>
+            <![CDATA[search?q=`aviatrix_log` AviatrixVPNSession | search $click.name$=$click.value$ | where NOT RXbytes="N/A"]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Total Tx Bytes by VPN User connection</title>
+        <search>
+          <query>`aviatrix_log` | eval secs=strptime(Duration, "%H:%M:%S")-strptime("00:00:00", "%H:%M:%S") |chart sum(TXbytes) as Total_TX_Bytes by User | sort Total_TX_Bytes desc limit=10</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown>
+          <link>
+            <![CDATA[search?q=`aviatrix_log` AviatrixVPNSession | search $click.name$=$click.value$ | where NOT TXbytes="N/A"]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Destination services by number of connections</title>
+        <search>
+          <query>`aviatrix_log`|  eval dst_port = DPT | lookup getservname dst_port| chart count by dst_servname|sort count desc | head 10</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">361</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Destination IP</title>
+        <search>
+          <query>`aviatrix_log`| eval dst_ip = DST | lookup gethostname dst_ip | chart count by dst_hostname|sort count desc | head 10</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Active VPN Sessions</title>
+        <search>
+          <query>`aviatrix_log` | search AviatrixVPNSession | dedup GatewayIP, User  |  where Status="active" | table GatewayIP User</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</dashboard>
