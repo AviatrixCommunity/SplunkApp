@@ -12,7 +12,7 @@ Aviatrix App for Splunk is an advanced reporting and analysis tool for Aviatrix 
 
 ### Step1: Install App
 
-This App is available on [Github](https://github.com/AviatrixCommunity/SplunkforAviatrix)
+This App is available on [Github](https://github.com/AviatrixSystems/SplunkforAviatrix)
 You can clone the github repository to install the App.
 From ``$SPLUNK_HOME/etc/apps/`` directory, type the following command::
   
@@ -69,6 +69,8 @@ This dashboard shows an overview of all the traffic logs collected by Splunk fro
 ### VPN Session
 
 This dashboard analyses data specific to VPN sessions. By default, it shows charts for all VPN sessions, but it can be filtered to show data corresponding to a VPN user in a particular gateway.
+![Vpn_Filtering](sample/Vpn_Filtering.png)
+
 ##### 1. Rx Bytes
 ![Rx_Bytes](sample/Rx_Bytes.png)
 
