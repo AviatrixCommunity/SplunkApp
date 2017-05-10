@@ -12,14 +12,17 @@ Aviatrix App for Splunk is an advanced reporting and analysis tool for Aviatrix 
 
 ### Step1: Install App
 
-This App is available on [Github](https://github.com/AviatrixSystems/SplunkforAviatrix)
+This App is available on [Github](https://github.com/AviatrixSystems/SplunkforAviatrix). There are different ways to install splunk app.
+#### Install via command line:
 You can clone the github repository to install the App.
-From ``$SPLUNK_HOME/etc/apps/`` directory, type the following command::
+From ``$SPLUNK_HOME/etc/apps/`` directory, type the following command:
   
     git clone https://github.com/AviatrixCommunity/SplunkforAviatrix.git SplunkforAviatrix
 
+#### Install via Splunk Enterprise UI:
 Alternatively you can download zipped app from this github repository by clicking `Clone or download > Download ZIP`, and then install it directly via Splunk Enterprise UI.
-
+* Go to your Splunk Enterprise Web interface, and click on `Manage Apps` button present in upper left hand corner.
+* Click on `Install app from file`.  `Choose file` to upload the downloaded zip file and then click on `Upload` to successfully install the splunk app.
 
 
 ### Step 2: Initial Setup
