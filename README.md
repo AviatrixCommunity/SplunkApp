@@ -80,5 +80,3 @@ This dashboard analyses data specific to VPN sessions. By default, it shows char
 # Support
 Found a bug or need a feature?
   [Open an issue on github](https://github.com/AviatrixSystems/SplunkforAviatrix/issues)
-
-
