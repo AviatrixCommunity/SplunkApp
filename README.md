@@ -1,5 +1,5 @@
 # Aviatrix App for Splunk
-Copyright &copy; 2014-2015 Aviatrix Systems,Inc. All rights reserved.
+Copyright &copy; 2014-2017 Aviatrix Systems,Inc. All rights reserved.
 
 * **App Homepage:** To be published
 * **Authors:** Rakesh Ranjan
