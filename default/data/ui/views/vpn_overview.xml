@@ -1,0 +1,92 @@
+<form>
+  <label>VPN Session</label>
+  <description></description>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="gw_name" searchWhenChanged="true">
+      <label>Gateway Name</label>
+      <fieldForLabel>Gateway</fieldForLabel>
+      <fieldForValue>Gateway</fieldForValue>
+      <choice value="*">All</choice>
+      <search>
+        <query>`aviatrix_log`| stats count by Gateway |eval gateway_lower = lower(Gateway)| sort - gateway_lower desc</query>
+      </search>
+      <default>*</default>
+      <change>
+        <unset token="form.gw_vpn_user"></unset>
+      </change>
+    </input>
+    <input type="dropdown" token="gw_vpn_user" searchWhenChanged="true">
+      <label>VPN User</label>
+      <fieldForLabel>User</fieldForLabel>
+      <fieldForValue>User</fieldForValue>
+      <choice value="*">All</choice>
+      <search>
+        <query>`aviatrix_log` | search Gateway=$gw_name$ | stats count by User | eval user_lower = lower(User) |sort - user_lower desc</query>
+      </search>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Rx Bytes</title>
+        <search>
+          <query>`aviatrix_log` | search Gateway=$gw_name$ User=$gw_vpn_user$ | chart sum(RXbytes) as Total_RX_Bytes by Gateway, User</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <drilldown>
+          <link>
+            <![CDATA[search?q=`aviatrix_log` $click.name$=$click.value$ | chart sum(RXbytes) as Total_RX_Bytes by Gateway, User]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Tx Bytes</title>
+        <search>
+          <query>`aviatrix_log` | search Gateway=$gw_name$ User=$gw_vpn_user$ | chart sum(TXbytes) as Total_TX_Bytes by Gateway, User</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <drilldown>
+          <link>
+            <![CDATA[search?q=`aviatrix_log` $click.name$=$click.value$ | chart sum(TXbytes) as Total_TX_Bytes by Gateway, User]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+</form>
