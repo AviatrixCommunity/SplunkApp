@@ -1,11 +1,11 @@
 # Aviatrix App for Splunk
 Copyright &copy; 2014-2017 Aviatrix Systems,Inc. All rights reserved.
 
-* **App Homepage:** To be published
+* **App Homepage:** https://splunkbase.splunk.com/app/3585/
 * **Authors:** Rakesh Ranjan
 * **App Version:** 1.0
 
-### Description ###
+## Description
 Aviatrix App for Splunk is an advanced reporting and analysis tool for Aviatrix cloud networking software. This app leverages Aviatrix controller and gateway logs and Splunk's search and visualization capabilities to provide monitoring and troubleshooting capabilities along with rapid insight and operational visibility for CloudOps and infrastructure engineers.
 
 ## Getting Started
@@ -16,13 +16,12 @@ This App is available on [Github](https://github.com/AviatrixSystems/SplunkforAv
 #### Install via command line:
 You can clone the github repository to install the App.
 From ``$SPLUNK_HOME/etc/apps/`` directory, type the following command:
-  
-    git clone https://github.com/AviatrixCommunity/SplunkforAviatrix.git SplunkforAviatrix
 
-#### Install via Splunk Enterprise UI:
-Alternatively you can download zipped app from this github repository by clicking `Clone or download > Download ZIP`, and then install it directly via Splunk Enterprise UI.
-* Go to your Splunk Enterprise Web interface, and click on `Manage Apps` button present in upper left hand corner.
-* Click on `Install app from file`.  `Choose file` to upload the downloaded zip file and then click on `Upload` to successfully install the splunk app.
+    git clone https://github.com/AviatrixCommunity/SplunkforAviatrix.git SplunkforAviatrix
+Restart splunk to start using the app.
+
+#### Install via Splunkbase:
+Alternatively you can download tar file of this app from [splunkbase](https://splunkbase.splunk.com/app/3585/), and follow instructions available there to install the app.
 
 
 ### Step 2: Initial Setup
@@ -38,7 +37,7 @@ Follow the steps below to enable the logging for Splunk and Sumo Logic.
 4. To enable AviatrixRule logging, select packet logging when configuring gateway security policies. This is done by clicking the gateway of interests at Gateway panel.
 5. To verify if the logs are delivered to the specified Splunk and Sumo Logic servers, make a user VPN connection through any gateway managed by the controller. At the prompt on Search bar of Splunk, type Aviatrix* and you shall see the Aviatrix logs.
 
-# Features
+## Features
 This app comes with few prebuilt dashboards.
 
 ### Overview
@@ -80,6 +79,6 @@ This dashboard analyses data specific to VPN sessions. By default, it shows char
 ##### 2. Tx Bytes
 ![Tx_Bytes](sample/Rx_Bytes.png)
 
-# Support
+## Support
 Found a bug or need a feature?
   [Open an issue on github](https://github.com/AviatrixSystems/SplunkforAviatrix/issues)
