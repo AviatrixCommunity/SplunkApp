@@ -35,9 +35,17 @@ access = read : [ * ], write : [ * ]
 export = system
 
 [views/overview]
-version = 6.5.3
-modtime = 1493890782.056550000
+version = 6.6.0
+modtime = 1496134088.552513000
 
 [views/vpn_overview]
-version = 6.5.3
-modtime = 1493890844.317189000
+version = 6.6.0
+modtime = 1496134182.102377000
+
+[views/gateway_overview]
+version = 6.6.0
+modtime = 1496132763.002520000
+
+[views/security_overview]
+version = 6.6.0
+modtime = 1496132714.261990000
