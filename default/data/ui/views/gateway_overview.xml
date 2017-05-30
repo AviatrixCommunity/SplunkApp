@@ -1,5 +1,5 @@
 <form>
-  <label>VPN Session</label>
+  <label>Gateway statistics</label>
   <description></description>
   <fieldset autoRun="true" submitButton="true">
     <input type="time" searchWhenChanged="true">
@@ -13,35 +13,24 @@
       <fieldForValue>Gateway</fieldForValue>
       <choice value="*">All</choice>
       <search>
-        <query>`aviatrix_log`| stats count by Gateway |eval gateway_lower = lower(Gateway)| sort - gateway_lower desc</query>
+        <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway|stats count by Gateway |eval gateway_lower = lower(Gateway)| sort - gateway_lower desc</query>
       </search>
       <default>*</default>
       <change>
         <unset token="form.gw_vpn_user"></unset>
       </change>
     </input>
-    <input type="dropdown" token="gw_vpn_user" searchWhenChanged="true">
-      <label>VPN User</label>
-      <fieldForLabel>User</fieldForLabel>
-      <fieldForValue>User</fieldForValue>
-      <choice value="*">All</choice>
-      <search>
-        <query>`aviatrix_log` | search Gateway=$gw_name$ | stats count by User | eval user_lower = lower(User) |sort - user_lower desc</query>
-      </search>
-      <default>*</default>
-    </input>
   </fieldset>
   <row>
     <panel>
-      <title>VPN connection duration by Gateway and User</title>
       <chart>
+        <title>Average Rx rate(Kb/s)</title>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession | search Gateway=$gw_name$ User=$gw_vpn_user$ | eval secs=strptime(Duration, "%H:%M:%S")-strptime("00:00:00", "%H:%M:%S") | chart sum(secs) as Total_Duration by Gateway, User</query>
+          <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_rx_rate "(?&lt;total_rx_rate&gt;\d+\.\d+)Kb" | chart eval(round(avg(total_rx_rate),2)) as avg_rate by Gateway</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
         </search>
         <option name="charting.axisTitleX.visibility">collapsed</option>
-        <option name="charting.axisTitleY.text">Connection duration</option>
         <option name="charting.axisTitleY.visibility">visible</option>
         <option name="charting.axisX.scale">linear</option>
         <option name="charting.axisY.scale">linear</option>
@@ -55,20 +44,20 @@
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixVPNSession | search Gateway=$gw_name$ User=$gw_vpn_user$ | eval secs=strptime(Duration, "%H:%M:%S")-strptime("00:00:00", "%H:%M:%S") | chart sum(secs) as Total_Duration by Gateway, User&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_rx_rate "(?&lt;total_rx_rate&gt;\d+\.\d+)Kb" | chart eval(round(avg(total_rx_rate),2)) as avg_rate by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
     <panel>
-      <title>VPN number of connections by SRC and DST IP</title>
       <chart>
+        <title>Average Tx rate(Kb/s)</title>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession | search Gateway=$gw_name$ User=$gw_vpn_user$ | rename VPNVirtualIP as SRC | stats count by SRC | join inner SRC max=0 [search AviatrixUser | table SRC DST] | chart count as cnt by SRC,DST | sort by cnt desc</query>
+          <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_tx_rate "(?&lt;total_tx_rate&gt;\d+\.\d+)Kb" | chart eval(round(avg(total_tx_rate),2)) as Avg_Tx_Rate(Kb/s) by Gateway</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
         </search>
         <option name="charting.axisTitleX.visibility">collapsed</option>
-        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
         <option name="charting.axisX.scale">linear</option>
         <option name="charting.axisY.scale">linear</option>
         <option name="charting.chart">column</option>
@@ -81,22 +70,22 @@
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixVPNSession | search Gateway=$gw_name$ User=$gw_vpn_user$ | rename VPNVirtualIP as SRC | stats count by SRC | join inner SRC max=0 [search AviatrixUser | table SRC DST] | chart count as cnt by SRC,DST | sort by cnt desc&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_tx_rate "(?&lt;total_tx_rate&gt;\d+\.\d+)Kb" | chart eval(round(avg(total_tx_rate),2)) as Avg_Tx_Rate(Kb/s) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
   </row>
   <row>
     <panel>
-      <title>Rx Bytes</title>
       <chart>
+        <title>Average CPU Idle time(%)</title>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession | search Gateway=$gw_name$ User=$gw_vpn_user$ | chart sum(RXbytes) as Total_RX_Bytes by Gateway, User</query>
+          <query>`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| chart eval(round(avg(cpu_idle),2)) as Avg_CPU_idle_time(%) by Gateway</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
         </search>
-        <option name="charting.axisTitleX.visibility">collapsed</option>
-        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
         <option name="charting.axisX.scale">linear</option>
         <option name="charting.axisY.scale">linear</option>
         <option name="charting.chart">column</option>
@@ -109,20 +98,20 @@
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` | search Gateway=$gw_name$ User=$gw_vpn_user$ | chart sum(RXbytes) as Total_RX_Bytes by Gateway, User&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| chart eval(round(avg(cpu_idle),2)) as Avg_CPU_idle_time(%) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
     <panel>
-      <title>Tx Bytes</title>
       <chart>
+        <title>Average disk usage(%)</title>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession | search Gateway=$gw_name$ User=$gw_vpn_user$ | chart sum(TXbytes) as Total_TX_Bytes by Gateway, User</query>
+          <query>`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval disk_usage = 100*(disk_total-disk_free)/disk_total | chart eval(round(avg(disk_usage),2)) as Avg_disk_usage(%) by Gateway</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
         </search>
-        <option name="charting.axisTitleX.visibility">collapsed</option>
-        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
         <option name="charting.axisX.scale">linear</option>
         <option name="charting.axisY.scale">linear</option>
         <option name="charting.chart">column</option>
@@ -135,7 +124,7 @@
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` | search Gateway=$gw_name$ User=$gw_vpn_user$ | chart sum(TXbytes) as Total_TX_Bytes by Gateway, User&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval disk_usage = 100*(disk_total-disk_free)/disk_total | chart eval(round(avg(disk_usage),2)) as Avg_disk_usage(%) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
