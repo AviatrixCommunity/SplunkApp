@@ -36,16 +36,16 @@ export = system
 
 [views/overview]
 version = 6.6.0
-modtime = 1496134088.552513000
+modtime = 1496647492.836068000
 
 [views/vpn_overview]
 version = 6.6.0
-modtime = 1496134182.102377000
+modtime = 1496658933.348509000
 
 [views/gateway_overview]
 version = 6.6.0
-modtime = 1496132763.002520000
+modtime = 1496658917.334307000
 
 [views/security_overview]
 version = 6.6.0
-modtime = 1496132714.261990000
+modtime = 1496658950.940616000

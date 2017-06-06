@@ -44,29 +44,29 @@ This app comes with few prebuilt dashboards.
 
 This dashboard shows an overview of all the traffic logs collected by Splunk from Aviatrix controller.
 
-##### 1. VPN Gateway locations by number of connections
-![VPN_Gateway_locations_by_number_of_connections](sample/1_VPN_Gateway_locations_by_number_of_connections.png)
+##### 1. Aviatrix Gateway locations by number of connections
+![Aviatrix_Gateway_locations_by_number_of_connections](sample/1_Aviatrix_Gateway_locations_by_number_of_connections.png)
 
-##### 2. Top 10 VPN connection duration by users
-![Top_10_VPN_connection_duration_by_users](sample/2_Top_10_VPN_connection_duration_by_users.png)
+##### 2. Top 10 VPN users
+![Top_10_VPN_users](sample/2_Top_10_VPN_users.png)
 
-##### 3. Top 10 VPN connection duration by users (hh:mm:sec)
-![Top_10_VPN_connection_duration_by_users (hh:mm:sec)](sample/3_Top_10_VPN_connection_duration_by_users(hh:mm:sec).png)
+##### 3. VPN users (hh:mm:sec)
+![VPN_users (hh:mm:sec)](sample/3_VPN_users(hh:mm:sec).png)
 
-##### 4. Total User connection time by gateway
-![Total_User_connection_time_by_gateway](sample/4_Total_User_connection_time_by_gateway.png)
+##### 4. Gateway utilization time
+![Gateway_utilization_time](sample/4_Gateway_utilization_time.png)
 
 ##### 5. Active VPN Sessions
 ![Active_VPN_Sessions](sample/5_Active_VPN_Sessions.png)
 
-##### 6. Destination services by number of connections
-![Destination_services_by_number_of_connections](sample/6_Destination_services_by_number_of_connections.png)
+##### 6. Top 10 services
+![Top_10_services](sample/6_Top_10_services.png)
 
-##### 7. Destination IP
-![Destination_IP](sample/7_Destination_IP.png)
+##### 7. Top 10 Destination IPs
+![Top_10_Destination_IPs](sample/7_Top_10_Destination_IPs.png)
 
 
-### Gateway statistics
+### Gateway
 
 This dashboard analyses Gatewway related data like network interface, memory, cpu, disk load,etc.
 ![Gateway_Statistics_fitering](sample/8_Gateway_Statistics_fitering.png)
@@ -74,43 +74,58 @@ This dashboard analyses Gatewway related data like network interface, memory, cp
 ##### 1. Average Rx rate(Kb/s)
 ![Average_Rx_rate_Kbps](sample/9_Average_Rx_rate_Kbps.png)
 
-##### 2. Average Tx rate(Kb/s)
-![Average_Tx_rate_Kbps](sample/10_Average_Tx_rate_Kbps.png)
+##### 2. Peak Rx rate(Kb/s)
+![Peak_Rx_rate_Kbps](sample/10_Peak_Rx_rate_Kbps.png)
 
-##### 3. Average CPU Idle time
-![Average_CPU_Idle_time](sample/11_Average_CPU_Idle_time.png)
+##### 3. Average Tx rate(Kb/s)
+![Average_Tx_rate_Kbps](sample/11_Average_Tx_rate_Kbps.png)
 
-##### 4. Average disk usage
-![Average_disk_usage](sample/12_Average_disk_usage.png)
+##### 4. Peak Tx rate(Kb/s)
+![Peak_Tx_rate_Kbps](sample/12_Peak_Tx_rate_Kbps.png)
+
+##### 5. Average CPU utilization
+![Average_CPU_utilization_time](sample/13_Average_CPU_utilization_time.png)
+
+##### 6. Peak CPU utilization
+![Peak_CPU_utilization_time](sample/14_Peak_CPU_utilization_time.png)
+
+##### 7. Disk usage
+![Disk_usage](sample/15_Disk_usage.png)
 
 
-### VPN Session
+### VPN
 
 This dashboard analyses data specific to VPN sessions. By default, it shows charts for all VPN sessions, but it can be filtered to show data corresponding to a VPN user in a particular gateway.
-![Vpn_Filtering](sample/13_VPN_Session_fitering.png)
+![Vpn_Filtering](sample/VPN_Session_fitering.png)
 
-##### 1. VPN connection duration by Gateway and User
-![VPN_connection_duration_by_Gateway_and_User](sample/14_VPN_connection_duration_by_Gateway_and_User.png)
+##### 1. Cumulative VPN session time
+![Cumulative_VPN_session_time](sample/16_Cumulative_VPN_session_time.png)
 
-##### 2. VPN number of connections by SRC and DST IP
-![VPN_number_of_connections_by_SRC_and_DST_IP](sample/15_VPN_number_of_connections_by_SRC_and_DST_IP.png)
+##### 2. VPN connections by SRC and DST IP
+![VPN_connections_by_SRC_and_DST_IP](sample/17_VPN_connections_by_SRC_and_DST_IP.png)
 
 ##### 3. Rx Bytes
-![Rx_Bytes](sample/16_Rx_Bytes.png)
+![Rx_Bytes](sample/18_Rx_Bytes.png)
 
 ##### 4. Tx Bytes
-![Tx_Bytes](sample/17_Tx_Bytes.png)
+![Tx_Bytes](sample/19_Tx_Bytes.png)
 
-### Security statistics
+##### 5. Accessed services
+![Accessed_services](sample/20_Accessed_services.png)
+
+##### 6. Destination IP connections
+![Destination_IP_connections](sample/21_Destination_IP_connections.png)
+
+### Security
 
 This dashboard shows data related to rules violations which can be filtered over gateway.
-![Security_statistics_filtering](sample/18_Security_statistics_filtering.png)
+![Security_statistics_filtering](sample/22_Security_statistics_filtering.png)
 
 ##### 1. Accepted domain names
-![Accepted_domain_names](sample/19_Accepted_domain_names.png)
+![Accepted_domain_names](sample/23_Accepted_domain_names.png)
 
 ##### 2. Blocked domain names
-![Blocked_domain_names](sample/20_Blocked_domain_names.png)
+![Blocked_domain_names](sample/24_Blocked_domain_names.png)
 
 ## Support
 Found a bug or need a feature?
