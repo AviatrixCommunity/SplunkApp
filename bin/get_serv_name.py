@@ -14,9 +14,11 @@ def serv_to_port(dst_servname):
 def port_to_serv(dst_port):
     try:
         dst_servname = socket.getservbyport(int(dst_port))
+        if dst_servname=='domain':
+            dst_servname='dns'
         return dst_servname.upper()
     except:
-        return ''
+        return str(dst_port)
 
 def main():
     if len(sys.argv) != 3:

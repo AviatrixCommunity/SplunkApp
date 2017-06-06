@@ -1,11 +1,16 @@
 <form>
-  <label>Security statistics</label>
+  <label>Security</label>
   <description></description>
-  <fieldset autoRun="true" submitButton="true">
+  <fieldset autoRun="true" submitButton="false">
     <input type="time" searchWhenChanged="true">
+      <label></label>
       <default>
+        <earliest>-60m@m</earliest>
         <latest>now</latest>
       </default>
+      <change>
+        <unset token="form.gw_name"></unset>
+      </change>
     </input>
     <input type="dropdown" token="gw_name" searchWhenChanged="true">
       <label>Gateway Name</label>
@@ -24,7 +29,7 @@
       <chart>
         <title>Accepted domain names</title>
         <search>
-          <query>`aviatrix_log` AviatrixFQDNRule process_http() "state=MATCHED" | search Gateway=$gw_name$ | chart count by hostname</query>
+          <query>`aviatrix_log` AviatrixFQDNRule process_http() "state=MATCHED" Gateway=$gw_name$ | chart count as Num_connections by hostname</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
           <sampleRatio>1</sampleRatio>
@@ -64,7 +69,7 @@
       <chart>
         <title>Blocked domain names</title>
         <search>
-          <query>`aviatrix_log` AviatrixFQDNRule "state=NO_MATCH"  | search Gateway=$gw_name$ | chart count by hostname</query>
+          <query>`aviatrix_log` AviatrixFQDNRule "state=NO_MATCH" Gateway=$gw_name$ | chart count as Num_connections by hostname</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
           <sampleRatio>1</sampleRatio>
