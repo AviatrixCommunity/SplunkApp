@@ -29,23 +29,35 @@
   <row>
     <panel>
       <chart>
-        <title>Average Rx rate(Kb/s)</title>
+        <title>Gateway Rx rate(Mb/s)</title>
         <search>
-          <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_rx_rate "(?&lt;total_rx_rate&gt;\d+\.\d+)Kb" | chart eval(round(avg(total_rx_rate),2)) as Avg_Rx_Rate(Kb/s) by Gateway</query>
+          <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_rx_rate "(?&lt;Value&gt;\d+\.\d+)(?&lt;Unit&gt;\w*)" | eval factor=case(Unit="Kb",0.00098,Unit="Mb",1,Unit="Gb",1024,Unit="Tb",1024*1024,true(),0) | eval total_rx_rate=Value*factor | timechart span=5m eval(round(avg(total_rx_rate),2)) as Avg_Rx_Rate(Mb/s) by Gateway useother=f</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
         <option name="charting.axisTitleX.visibility">visible</option>
         <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
         <option name="charting.axisX.scale">linear</option>
         <option name="charting.axisY.scale">linear</option>
-        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
         <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
         <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
         <option name="charting.chart.stackMode">stacked</option>
         <option name="charting.chart.style">shiny</option>
         <option name="charting.drilldown">all</option>
         <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
@@ -55,51 +67,35 @@
     </panel>
     <panel>
       <chart>
-        <title>Peak Rx rate(Kb/s)</title>
+        <title>Gateway Tx rate(Mb/s)</title>
         <search>
-          <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_rx_rate "(?&lt;total_rx_rate&gt;\d+\.\d+)Kb" | chart eval(round(max(total_rx_rate),2)) as Peak_Rx_Rate(Kb/s) by Gateway</query>
+          <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_tx_rate "(?&lt;Value&gt;\d+\.\d+)(?&lt;Unit&gt;\w*)" | eval factor=case(Unit="Kb",0.00098,Unit="Mb",1,Unit="Gb",1024,Unit="Tb",1024*1024,true(),0) | eval total_tx_rate=Value*factor | timechart span=5m eval(round(avg(total_tx_rate),2)) as Avg_Tx_Rate(Mb/s) by Gateway useother=f</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
         <option name="charting.axisTitleX.visibility">visible</option>
         <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
         <option name="charting.axisX.scale">linear</option>
         <option name="charting.axisY.scale">linear</option>
-        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
         <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
         <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
         <option name="charting.chart.stackMode">stacked</option>
         <option name="charting.chart.style">shiny</option>
         <option name="charting.drilldown">all</option>
         <option name="charting.layout.splitSeries">0</option>
-        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
-        <option name="charting.legend.placement">bottom</option>
-        <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_rx_rate "(?&lt;total_rx_rate&gt;\d+\.\d+)Kb" | chart eval(round(avg(total_rx_rate),2)) as avg_rate by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
-        </drilldown>
-      </chart>
-    </panel>
-  </row>
-  <row>
-    <panel>
-      <chart>
-        <title>Average Tx rate(Kb/s)</title>
-        <search>
-          <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_tx_rate "(?&lt;total_tx_rate&gt;\d+\.\d+)Kb" | chart eval(round(avg(total_tx_rate),2)) as Avg_Tx_Rate(Kb/s) by Gateway</query>
-          <earliest>$earliest$</earliest>
-          <latest>$latest$</latest>
-        </search>
-        <option name="charting.axisTitleX.visibility">visible</option>
-        <option name="charting.axisTitleY.visibility">visible</option>
-        <option name="charting.axisX.scale">linear</option>
-        <option name="charting.axisY.scale">linear</option>
-        <option name="charting.chart">pie</option>
-        <option name="charting.chart.nullValueMode">connect</option>
-        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
-        <option name="charting.chart.stackMode">stacked</option>
-        <option name="charting.chart.style">shiny</option>
-        <option name="charting.drilldown">all</option>
-        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
@@ -107,53 +103,39 @@
         </drilldown>
       </chart>
     </panel>
-    <panel>
-      <chart>
-        <title>Peak Tx rate(Kb/s)</title>
-        <search>
-          <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_tx_rate "(?&lt;total_tx_rate&gt;\d+\.\d+)Kb" | chart eval(round(max(total_tx_rate),2)) as Peak_Tx_Rate(Kb/s) by Gateway</query>
-          <earliest>$earliest$</earliest>
-          <latest>$latest$</latest>
-        </search>
-        <option name="charting.axisTitleX.visibility">visible</option>
-        <option name="charting.axisTitleY.visibility">visible</option>
-        <option name="charting.axisX.scale">linear</option>
-        <option name="charting.axisY.scale">linear</option>
-        <option name="charting.chart">pie</option>
-        <option name="charting.chart.nullValueMode">connect</option>
-        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
-        <option name="charting.chart.stackMode">stacked</option>
-        <option name="charting.chart.style">shiny</option>
-        <option name="charting.drilldown">all</option>
-        <option name="charting.layout.splitSeries">0</option>
-        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
-        <option name="charting.legend.placement">bottom</option>
-        <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| chart eval(round(avg(cpu_idle),2)) as Avg_CPU_idle_time(%) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
-        </drilldown>
-      </chart>
-    </panel>
   </row>
   <row>
     <panel>
       <chart>
-        <title>Average CPU utilization(%)</title>
+        <title>Gateway CPU utilization(%)</title>
         <search>
-          <query>`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval cpu_time=100-cpu_idle | chart eval(round(avg(cpu_time),2)) as Avg_CPU_utilization(%) by Gateway</query>
+          <query>`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval cpu_time=100-cpu_idle | timechart span=5m eval(round(avg(cpu_time),2)) as Avg_CPU_utilization(%) by Gateway  useother=f</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
         <option name="charting.axisTitleX.visibility">visible</option>
         <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
         <option name="charting.axisX.scale">linear</option>
         <option name="charting.axisY.scale">linear</option>
-        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
         <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
         <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
         <option name="charting.chart.stackMode">stacked</option>
         <option name="charting.chart.style">shiny</option>
         <option name="charting.drilldown">all</option>
         <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
@@ -163,49 +145,35 @@
     </panel>
     <panel>
       <chart>
-        <title>Peak CPU utilization(%)</title>
+        <title>Gateway Disk usage(%)</title>
         <search>
-          <query>`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval cpu_time=100-cpu_idle | chart eval(round(max(cpu_time),2)) as Peak_CPU_utilization(%) by Gateway</query>
+          <query>`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval disk_usage = 100*(disk_total-disk_free)/disk_total | timechart span=5m eval(round(first(disk_usage),2)) as Disk_usage(%) by Gateway  useother=f</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
         <option name="charting.axisTitleX.visibility">visible</option>
         <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
         <option name="charting.axisX.scale">linear</option>
         <option name="charting.axisY.scale">linear</option>
-        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
         <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
         <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
         <option name="charting.chart.stackMode">stacked</option>
         <option name="charting.chart.style">shiny</option>
         <option name="charting.drilldown">all</option>
         <option name="charting.layout.splitSeries">0</option>
-        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
-        <option name="charting.legend.placement">bottom</option>
-        <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| chart eval(round(avg(cpu_idle),2)) as Avg_CPU_idle_time(%) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
-        </drilldown>
-      </chart>
-    </panel>
-    <panel>
-      <chart>
-        <title>Disk usage(%)</title>
-        <search>
-          <query>`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval disk_usage = 100*(disk_total-disk_free)/disk_total | chart eval(round(first(disk_usage),2)) as Disk_usage(%) by Gateway</query>
-          <earliest>$earliest$</earliest>
-          <latest>$latest$</latest>
-        </search>
-        <option name="charting.axisTitleX.visibility">visible</option>
-        <option name="charting.axisTitleY.visibility">visible</option>
-        <option name="charting.axisX.scale">linear</option>
-        <option name="charting.axisY.scale">linear</option>
-        <option name="charting.chart">pie</option>
-        <option name="charting.chart.nullValueMode">connect</option>
-        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
-        <option name="charting.chart.stackMode">stacked</option>
-        <option name="charting.chart.style">shiny</option>
-        <option name="charting.drilldown">all</option>
-        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
