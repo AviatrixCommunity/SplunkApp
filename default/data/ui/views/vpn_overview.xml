@@ -1,29 +1,17 @@
 <form>
-  <label>VPN</label>
+  <label>Openvpn</label>
   <description></description>
   <fieldset autoRun="true" submitButton="false">
     <input type="time" searchWhenChanged="true">
       <label></label>
       <default>
-        <earliest>-60m@m</earliest>
-        <latest>now</latest>
+        <earliest>0</earliest>
+        <latest></latest>
       </default>
       <change>
-        <unset token="form.gw_name"></unset>
         <unset token="form.gw_vpn_user"></unset>
-      </change>
-    </input>
-    <input type="dropdown" token="gw_name" searchWhenChanged="true">
-      <label>Gateway Name</label>
-      <fieldForLabel>Gateway</fieldForLabel>
-      <fieldForValue>Gateway</fieldForValue>
-      <choice value="*">All</choice>
-      <search>
-        <query>`aviatrix_log` AviatrixVPNSession | stats count by Gateway |eval gateway_lower = lower(Gateway)| sort - gateway_lower desc</query>
-      </search>
-      <default>*</default>
-      <change>
-        <unset token="form.gw_vpn_user"></unset>
+        <unset token="form.src_ip"></unset>
+        <unset token="form.dst_ip"></unset>
       </change>
     </input>
     <input type="dropdown" token="gw_vpn_user" searchWhenChanged="true">
@@ -32,88 +20,100 @@
       <fieldForValue>User</fieldForValue>
       <choice value="*">All</choice>
       <search>
-        <query>`aviatrix_log` AviatrixVPNSession | search Gateway=$gw_name$ | stats count by User | eval user_lower = lower(User) |sort - user_lower desc</query>
+        <query>`aviatrix_log` AviatrixVPNSession | stats count by User | eval user_lower = lower(User) |sort - user_lower desc</query>
       </search>
       <default>*</default>
+      <change>
+        <unset token="form.src_ip"></unset>
+        <unset token="form.dst_ip"></unset>
+      </change>
     </input>
   </fieldset>
   <row>
     <panel>
-      <title>Cumulative VPN session time</title>
-      <chart>
+      <title>Traffic by SRC and DST IP</title>
+      <input type="text" token="src_ip">
+        <label>SRC</label>
+        <default></default>
+        <change>
+          <unset token="form.dst_ip"></unset>
+        </change>
+        <prefix>VPNVirtualIP="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="text" token="dst_ip" searchWhenChanged="true">
+        <label>DST</label>
+        <default></default>
+        <prefix>DST="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <table>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession Gateway=$gw_name$ User=$gw_vpn_user$ | eval secs=strptime(Logout,"%Y-%m-%d %H:%M:%S")-strptime(Login,"%Y-%m-%d %H:%M:%S") | chart sum(secs) as Total_Duration by Gateway, User</query>
+          <query>`aviatrix_log` AviatrixVPNSession User=$gw_vpn_user$ $src_ip$ Status=disconnected | append [search `aviatrix_log` AviatrixVPNSession User=$gw_vpn_user$ $src_ip$ | dedup Gateway, User| where Status="active"] | rename VPNVirtualIP as SRC |eval Login=strptime(Login,"%Y-%m-%d %H:%M:%S")|eval Logout=if(Logout="N/A",now(),strptime( Logout ,"%Y-%m-%d %H:%M:%S"))| table User SRC Login Logout | join inner SRC max=0 [search AviatrixUser $dst_ip$|rename _time as usertime| table usertime SRC DST ] | where usertime&gt;Login AND usertime&lt;Logout | eval usertime=strftime(usertime,"%Y-%m-%d %H:%M:%S")|table usertime User SRC DST</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
-        <option name="charting.axisTitleX.visibility">visible</option>
-        <option name="charting.axisTitleY.text">Session time (sec)</option>
-        <option name="charting.axisTitleY.visibility">visible</option>
-        <option name="charting.axisX.scale">linear</option>
-        <option name="charting.axisY.scale">linear</option>
-        <option name="charting.chart">column</option>
-        <option name="charting.chart.nullValueMode">connect</option>
-        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
-        <option name="charting.chart.stackMode">stacked</option>
-        <option name="charting.chart.style">shiny</option>
-        <option name="charting.drilldown">all</option>
-        <option name="charting.layout.splitSeries">0</option>
-        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
-        <option name="charting.legend.placement">bottom</option>
+        <option name="drilldown">cell</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixVPNSession | search Gateway=$gw_name$ User=$gw_vpn_user$ | eval secs=strptime(Duration, "%H:%M:%S")-strptime("00:00:00", "%H:%M:%S") | chart sum(secs) as Total_Duration by Gateway, User&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixVPNSession | search Gateway=$gw_name$ User=$gw_vpn_user$ | rename VPNVirtualIP as SRC | stats count by SRC | join inner SRC max=0 [search AviatrixUser | table SRC DST] | chart count as cnt by SRC,DST | sort by cnt desc&amp;earliest=undefined&amp;latest=undefined</link>
         </drilldown>
-      </chart>
+      </table>
     </panel>
+  </row>
+  <row>
     <panel>
-      <title>VPN connections by SRC and DST IP</title>
       <chart>
+        <title>VPN User Session stats</title>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession Gateway=$gw_name$ User=$gw_vpn_user$ | rename VPNVirtualIP as SRC | stats count by SRC | join inner SRC max=0 [search AviatrixUser | table SRC DST] | chart count as cnt by SRC,DST | sort by cnt desc</query>
+          <query>`aviatrix_log` AviatrixVPNSession User=$gw_vpn_user$| eval Action=if(Status="active",1,0) | eval Time=if(Status="active",Login,Logout) | eval _time=if(Status="active",strptime(Login,"%Y-%m-%d %H:%M:%S"),strptime(Logout,"%Y-%m-%d %H:%M:%S"))| chart last(Action) as action by _time,User | makecontinuous span=1m | filldown</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
         </search>
-        <option name="charting.axisTitleX.visibility">visible</option>
-        <option name="charting.axisTitleY.text">Number of connections</option>
-        <option name="charting.axisTitleY.visibility">visible</option>
-        <option name="charting.axisX.scale">linear</option>
-        <option name="charting.axisY.scale">linear</option>
-        <option name="charting.chart">column</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.maximumNumber">1</option>
+        <option name="charting.axisY2.minimumNumber">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
         <option name="charting.chart.nullValueMode">connect</option>
-        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
-        <option name="charting.chart.stackMode">stacked</option>
-        <option name="charting.chart.style">shiny</option>
-        <option name="charting.drilldown">all</option>
-        <option name="charting.layout.splitSeries">0</option>
-        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
-        <option name="charting.legend.placement">bottom</option>
-        <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixVPNSession | search Gateway=$gw_name$ User=$gw_vpn_user$ | rename VPNVirtualIP as SRC | stats count by SRC | join inner SRC max=0 [search AviatrixUser | table SRC DST] | chart count as cnt by SRC,DST | sort by cnt desc&amp;earliest=$earliest$&amp;latest=$latest$</link>
-        </drilldown>
+        <option name="charting.drilldown">none</option>
       </chart>
     </panel>
   </row>
   <row>
     <panel>
-      <title>Rx Bytes</title>
       <chart>
+        <title>Rx Bytes(MB)</title>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession Gateway=$gw_name$ User=$gw_vpn_user$ | chart sum(RXbytes) as Total_RX_Bytes by Gateway, User</query>
+          <query>`aviatrix_log` AviatrixVPNSession User=$gw_vpn_user$ | rex field=RXbytes "(?&lt;Value&gt;\d+\.\d+)(?&lt;Unit&gt;\w*)" | eval factor=case(Unit="B",0,Unit="KB",0.001,Unit="MB",1,Unit="GB",1024,Unit="TB",1024*1024,true(),0) | eval InBytes=Value*factor | chart sum(InBytes) as Total_RX_Bytes by User</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
         <option name="charting.axisTitleX.visibility">visible</option>
         <option name="charting.axisTitleY.text">RX Bytes</option>
         <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
         <option name="charting.axisX.scale">linear</option>
         <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
         <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
         <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
         <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
         <option name="charting.chart.stackMode">stacked</option>
         <option name="charting.chart.style">shiny</option>
         <option name="charting.drilldown">all</option>
         <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
@@ -122,25 +122,37 @@
       </chart>
     </panel>
     <panel>
-      <title>Tx Bytes</title>
       <chart>
+        <title>Tx Bytes(MB)</title>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession Gateway=$gw_name$ User=$gw_vpn_user$ | chart sum(TXbytes) as Total_TX_Bytes by Gateway, User</query>
+          <query>`aviatrix_log` AviatrixVPNSession User=$gw_vpn_user$ | rex field=TXbytes "(?&lt;Value&gt;\d+\.\d+)(?&lt;Unit&gt;\w*)" | eval factor=case(Unit="B",0,Unit="KB",0.001,Unit="MB",1,Unit="GB",1024,Unit="TB",1024*1024,true(),0) | eval InBytes=Value*factor | chart sum(InBytes) as Total_TX_Bytes by User</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
         <option name="charting.axisTitleX.visibility">visible</option>
         <option name="charting.axisTitleY.text">TX Bytes</option>
         <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
         <option name="charting.axisX.scale">linear</option>
         <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
         <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
         <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
         <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
         <option name="charting.chart.stackMode">stacked</option>
         <option name="charting.chart.style">shiny</option>
         <option name="charting.drilldown">all</option>
         <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
@@ -151,12 +163,14 @@
   </row>
   <row>
     <panel>
-      <title>Accessed services</title>
       <chart>
+        <title>Accessed services</title>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession Gateway=$gw_name$ User=$gw_vpn_user$ | rename VPNVirtualIP as SRC | stats count by SRC | join inner SRC max=0 [search AviatrixUser | eval dst_port = DPT | lookup getservname dst_port| rename dst_servname as Destination_Service_Name| table SRC Destination_Service_Name] | chart count as Num_connections by Destination_Service_Name | sort by Num_connections desc</query>
+          <query>`aviatrix_log` AviatrixVPNSession User=$gw_vpn_user$ Status=disconnected | append [search `aviatrix_log` AviatrixVPNSession User=$gw_vpn_user$ | dedup Gateway, User  | where Status="active"] | rename VPNVirtualIP as SRC | eval Login=strptime(Login,"%Y-%m-%d %H:%M:%S")|eval Logout=if(Logout="N/A",now(),strptime( Logout ,"%Y-%m-%d %H:%M:%S"))| table SRC Login Logout | join inner SRC max=0 [search AviatrixUser | eval dst_port = DPT | lookup getservname dst_port| rename dst_servname as Destination_Service_Name| rename _time as usertime| table usertime SRC Destination_Service_Name] | where usertime&gt;Login AND usertime&lt;Logout | chart count as Num_connections by Destination_Service_Name</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="charting.axisTitleX.visibility">collapsed</option>
         <option name="charting.axisTitleY.visibility">collapsed</option>
@@ -174,15 +188,27 @@
         <drilldown>
           <link target="_blank">search?q=`aviatrix_log` | search Gateway=$gw_name$ User=$gw_vpn_user$ | chart sum(RXbytes) as Total_RX_Bytes by Gateway, User&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
       </chart>
     </panel>
     <panel>
-      <title>Destination IP connections</title>
       <chart>
+        <title>Destination IP connections</title>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession Gateway=$gw_name$ User=$gw_vpn_user$ | rename VPNVirtualIP as SRC | stats count by SRC | join inner SRC max=0 [search AviatrixUser | table SRC DST] | chart count as Num_connections by DST | sort by Num_connections desc</query>
+          <query>`aviatrix_log` AviatrixVPNSession User=$gw_vpn_user$ Status=disconnected | append [search `aviatrix_log` AviatrixVPNSession User=$gw_vpn_user$ | dedup Gateway, User  | where Status="active"] | rename VPNVirtualIP as SRC |eval Login=strptime(Login,"%Y-%m-%d %H:%M:%S")|eval Logout=if(Logout="N/A",now(),strptime( Logout ,"%Y-%m-%d %H:%M:%S"))| table SRC Login Logout | join inner SRC max=0 [search AviatrixUser |rename _time as usertime| table usertime SRC DST ] | where usertime&gt;Login AND usertime&lt;Logout | chart count as Num_connections by DST</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="charting.axisTitleX.visibility">collapsed</option>
         <option name="charting.axisTitleY.visibility">collapsed</option>
@@ -200,6 +226,16 @@
         <drilldown>
           <link target="_blank">search?q=`aviatrix_log` | search Gateway=$gw_name$ User=$gw_vpn_user$ | chart sum(TXbytes) as Total_TX_Bytes by Gateway, User&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
       </chart>
     </panel>
   </row>

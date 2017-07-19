@@ -1,12 +1,12 @@
-<form>
+<form refresh="300">
   <label>Security</label>
   <description></description>
   <fieldset autoRun="true" submitButton="false">
     <input type="time" searchWhenChanged="true">
       <label></label>
       <default>
-        <earliest>-60m@m</earliest>
-        <latest>now</latest>
+        <earliest>0</earliest>
+        <latest></latest>
       </default>
       <change>
         <unset token="form.gw_name"></unset>
@@ -18,7 +18,7 @@
       <fieldForLabel>Gateway</fieldForLabel>
       <fieldForValue>Gateway</fieldForValue>
       <search>
-        <query>`aviatrix_log` AviatrixFQDNRule | stats count by Gateway</query>
+        <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway|stats count by Gateway |eval gateway_lower = lower(Gateway)| sort - gateway_lower desc</query>
       </search>
       <default>*</default>
       <initialValue>*</initialValue>
@@ -104,6 +104,53 @@
           <link target="_blank">search?q=`aviatrix_log` AviatrixFQDNRule "state=NO_MATCH"  | search Gateway=$gw_name$ | chart count by hostname&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Packets dropped</title>
+      <input type="text" token="src" searchWhenChanged="true">
+        <label>Source IP</label>
+        <choice value="*">All</choice>
+        <default></default>
+        <fieldForLabel>SRC</fieldForLabel>
+        <fieldForValue>SRC</fieldForValue>
+        <prefix>SRC="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="text" token="dst">
+        <label>Destination IP</label>
+        <choice value="*">All</choice>
+        <default></default>
+        <fieldForLabel>DST</fieldForLabel>
+        <fieldForValue>DST</fieldForValue>
+        <prefix>DST="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <input type="text" token="dpt" searchWhenChanged="true">
+        <label>Destination Port</label>
+        <choice value="*">All</choice>
+        <fieldForLabel>DPT</fieldForLabel>
+        <fieldForValue>DPT</fieldForValue>
+        <default></default>
+        <prefix>DPT="</prefix>
+        <suffix>"</suffix>
+      </input>
+      <table>
+        <search>
+          <query>AvxRl D: $src$ $dst$ $dpt$| rex field=_raw "AvxRl\s(?&lt;Gateway&gt;\w+)"|search $gw_name$|eval SourceIP=SRC|eval DestinationIP=DST|eval DestinationPort=DPT|table _time Gateway SourceIP DestinationIP DestinationPort</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
     </panel>
   </row>
 </form>
