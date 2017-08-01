@@ -13,12 +13,14 @@
       </change>
     </input>
     <input type="dropdown" token="gw_name" searchWhenChanged="true">
-      <label>Gateway Name</label>
+      <label>NAT Gateway</label>
       <choice value="*">All</choice>
       <fieldForLabel>Gateway</fieldForLabel>
       <fieldForValue>Gateway</fieldForValue>
       <search>
-        <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway|stats count by Gateway |eval gateway_lower = lower(Gateway)| sort - gateway_lower desc</query>
+        <query>`aviatrix_log` AviatrixFQDNRule | chart count by Gateway</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
       </search>
       <default>*</default>
       <initialValue>*</initialValue>
@@ -26,13 +28,15 @@
   </fieldset>
   <row>
     <panel>
+      <title>FQDN Accepted Domain Names</title>
       <chart>
-        <title>Accepted domain names</title>
         <search>
-          <query>`aviatrix_log` AviatrixFQDNRule process_http() "state=MATCHED" Gateway=$gw_name$ | chart count as Num_connections by hostname</query>
+          <query>`aviatrix_log` AviatrixFQDNRule process_http() Gateway=$gw_name$ NOT "drop_reason"| chart count as Num_connections by hostname</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
           <sampleRatio>1</sampleRatio>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
         <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
@@ -66,13 +70,15 @@
       </chart>
     </panel>
     <panel>
+      <title>FQDN Blocked Domain Names</title>
       <chart>
-        <title>Blocked domain names</title>
         <search>
-          <query>`aviatrix_log` AviatrixFQDNRule "state=NO_MATCH" Gateway=$gw_name$ | chart count as Num_connections by hostname</query>
+          <query>`aviatrix_log` AviatrixFQDNRule process_http() "drop_reason" Gateway=$gw_name$ | chart count as Num_connections by hostname</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
           <sampleRatio>1</sampleRatio>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
         <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
@@ -108,40 +114,46 @@
   </row>
   <row>
     <panel>
-      <title>Packets dropped</title>
+      <title>Gateway Security Policy Denied Events</title>
+      <input type="dropdown" token="gw_name1" searchWhenChanged="true">
+        <label>Gateway Name</label>
+        <choice value="*">All</choice>
+        <default>*</default>
+        <initialValue>*</initialValue>
+        <fieldForLabel>Gateway</fieldForLabel>
+        <fieldForValue>Gateway</fieldForValue>
+        <search>
+          <query>AvxRl | rex field=_raw "AvxRl\s(?&lt;Gateway&gt;\w+)"| stats count by Gateway</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+      </input>
       <input type="text" token="src" searchWhenChanged="true">
         <label>Source IP</label>
-        <choice value="*">All</choice>
         <default></default>
-        <fieldForLabel>SRC</fieldForLabel>
-        <fieldForValue>SRC</fieldForValue>
         <prefix>SRC="</prefix>
         <suffix>"</suffix>
       </input>
       <input type="text" token="dst">
         <label>Destination IP</label>
-        <choice value="*">All</choice>
         <default></default>
-        <fieldForLabel>DST</fieldForLabel>
-        <fieldForValue>DST</fieldForValue>
         <prefix>DST="</prefix>
         <suffix>"</suffix>
       </input>
       <input type="text" token="dpt" searchWhenChanged="true">
         <label>Destination Port</label>
-        <choice value="*">All</choice>
-        <fieldForLabel>DPT</fieldForLabel>
-        <fieldForValue>DPT</fieldForValue>
         <default></default>
         <prefix>DPT="</prefix>
         <suffix>"</suffix>
       </input>
       <table>
         <search>
-          <query>AvxRl D: $src$ $dst$ $dpt$| rex field=_raw "AvxRl\s(?&lt;Gateway&gt;\w+)"|search $gw_name$|eval SourceIP=SRC|eval DestinationIP=DST|eval DestinationPort=DPT|table _time Gateway SourceIP DestinationIP DestinationPort</query>
+          <query>AvxRl D: $src$ $dst$ $dpt$| rex field=_raw "AvxRl\s(?&lt;Gateway&gt;\w+)"|search $gw_name1$|eval SourceIP=SRC|eval DestinationIP=DST|eval DestinationPort=DPT |table _time Gateway SourceIP DestinationIP DestinationPort</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
           <sampleRatio>1</sampleRatio>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="count">10</option>
         <option name="dataOverlayMode">none</option>

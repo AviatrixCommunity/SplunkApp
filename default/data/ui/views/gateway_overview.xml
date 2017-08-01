@@ -29,7 +29,7 @@
   <row>
     <panel>
       <chart>
-        <title>Gateway Rx rate(Mb/s)</title>
+        <title>Gateway Rx Rate(Mb/s)</title>
         <search>
           <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_rx_rate "(?&lt;Value&gt;\d+\.\d+)(?&lt;Unit&gt;\w*)" | eval factor=case(Unit="Kb",0.00098,Unit="Mb",1,Unit="Gb",1024,Unit="Tb",1024*1024,true(),0) | eval total_rx_rate=Value*factor | timechart span=5m eval(round(avg(total_rx_rate),2)) as Avg_Rx_Rate(Mb/s) by Gateway useother=f</query>
           <earliest>$earliest$</earliest>
@@ -67,7 +67,7 @@
     </panel>
     <panel>
       <chart>
-        <title>Gateway Tx rate(Mb/s)</title>
+        <title>Gateway Tx Rate(Mb/s)</title>
         <search>
           <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_tx_rate "(?&lt;Value&gt;\d+\.\d+)(?&lt;Unit&gt;\w*)" | eval factor=case(Unit="Kb",0.00098,Unit="Mb",1,Unit="Gb",1024,Unit="Tb",1024*1024,true(),0) | eval total_tx_rate=Value*factor | timechart span=5m eval(round(avg(total_tx_rate),2)) as Avg_Tx_Rate(Mb/s) by Gateway useother=f</query>
           <earliest>$earliest$</earliest>
@@ -107,7 +107,7 @@
   <row>
     <panel>
       <chart>
-        <title>Gateway CPU utilization(%)</title>
+        <title>Gateway CPU Utilization(%)</title>
         <search>
           <query>`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval cpu_time=100-cpu_idle | timechart span=5m eval(round(avg(cpu_time),2)) as Avg_CPU_utilization(%) by Gateway  useother=f</query>
           <earliest>$earliest$</earliest>
@@ -145,7 +145,7 @@
     </panel>
     <panel>
       <chart>
-        <title>Gateway Disk usage(%)</title>
+        <title>Gateway Disk Usage(%)</title>
         <search>
           <query>`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval disk_usage = 100*(disk_total-disk_free)/disk_total | timechart span=5m eval(round(first(disk_usage),2)) as Disk_usage(%) by Gateway  useother=f</query>
           <earliest>$earliest$</earliest>
