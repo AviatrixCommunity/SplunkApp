@@ -1,15 +1,6 @@
-<form refresh="300">
+<form refresh="300" stylesheet="my_stylesheet.css">
   <label>Overview</label>
-  <description></description>
-  <fieldset submitButton="false" autoRun="true">
-    <input type="time" searchWhenChanged="true">
-      <label></label>
-      <default>
-        <earliest>0</earliest>
-        <latest></latest>
-      </default>
-    </input>
-  </fieldset>
+  <fieldset submitButton="false" autoRun="true"></fieldset>
   <row>
     <panel>
       <single>
@@ -17,21 +8,26 @@
           <query>`aviatrix_log` AviatrixGwNetStats earliest=-5m@m|rename name as Gateway | stats dc(Gateway)</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="drilldown">none</option>
-        <option name="underLabel">Gateways</option>
+        <option name="underLabel">gateways</option>
         <option name="useColors">0</option>
       </single>
     </panel>
     <panel>
       <single>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession | dedup Gateway, User  |  where Status="active" | stats dc(User)</query>
+          <query>`aviatrix_log` AviatrixVPNSession | dedup Gateway, User  |  where Status="active" | stats count</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="drilldown">none</option>
-        <option name="underLabel">Active OpenVPN Users</option>
+        <option name="underLabel">active Openvpn users reported</option>
+        <option name="useColors">0</option>
       </single>
     </panel>
     <panel>
@@ -40,11 +36,13 @@
           <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 | where State="Up" | stats count</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="drilldown">none</option>
-        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeColors">["0x000","0x65a637"]</option>
         <option name="rangeValues">[0]</option>
-        <option name="underLabel">tunnels Up</option>
+        <option name="underLabel">up tunnels reported</option>
         <option name="useColors">1</option>
       </single>
     </panel>
@@ -54,67 +52,85 @@
           <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 | where State="Down" | stats count</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="colorMode">none</option>
         <option name="drilldown">none</option>
         <option name="rangeColors">["0x000","0xd93f3c"]</option>
         <option name="rangeValues">[0]</option>
-        <option name="underLabel">tunnels Down</option>
+        <option name="underLabel">down tunnels reported</option>
         <option name="useColors">1</option>
       </single>
     </panel>
   </row>
   <row>
     <panel>
-      <title>Tunnel status</title>
+      <title>Latest Tunnel Status</title>
       <input type="dropdown" token="gateway1" searchWhenChanged="true">
         <label>Gateway1</label>
         <choice value="*">All</choice>
         <fieldForLabel>Gateway1</fieldForLabel>
-        <fieldForValue>Gateway1</fieldForValue>
         <search>
           <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 | where State="Up" or State="Down" | stats count by Gateway1</query>
-          <earliest>$earliest$</earliest>
-          <latest>$latest$</latest>
         </search>
         <change>
           <unset token="form.gateway2"></unset>
         </change>
         <default>*</default>
+        <initialValue>*</initialValue>
+        <fieldForValue>Gateway1</fieldForValue>
       </input>
       <input type="dropdown" token="gateway2" searchWhenChanged="true">
         <label>Gateway2</label>
         <choice value="*">All</choice>
         <fieldForLabel>Gateway2</fieldForLabel>
-        <fieldForValue>Gateway2</fieldForValue>
         <search>
-          <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 |search $gateway1$| where State="Up" OR State="Down" | stats count by Gateway2</query>
+          <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 |search Gateway1="$gateway1$"| where State="Up" OR State="Down" | stats count by Gateway2</query>
         </search>
         <default>*</default>
         <initialValue>*</initialValue>
+        <fieldForValue>Gateway2</fieldForValue>
       </input>
       <table>
         <search>
-          <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State |eval Latency(sec)=round(latency,2)| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 |where State="Up" or State="Down" |search $gateway1$ Gateway2="$gateway2$"|rex field=Gateway1 "(?&lt;gw1&gt;\w+)\((?&lt;gw1_vendor&gt;\w+)\s(?&lt;gw1_region&gt;\S+)\)" |rex field=Gateway2 "(?&lt;gw2&gt;\w+)\((?&lt;gw2_vendor&gt;\w+)\s(?&lt;gw2_region&gt;\S+)\)"|eval Peering_type=case(gw1_vendor=gw2_vendor AND gw1_region=gw2_region,"Same cloud, Same region",gw1_vendor=gw2_vendor,"Same cloud, different region",true(),"Inter-Cloud")|table Gateway1 Gateway2 Latency(sec) Peering_type State</query>
+          <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State |eval Latency=round(latency,2)| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 |where State="Up" or State="Down" |search Gateway1="$gateway1$" Gateway2="$gateway2$"|rex field=Gateway1 "(?&lt;gw1&gt;\w+)\((?&lt;gw1_vendor&gt;\w+)\s(?&lt;gw1_region&gt;\S+)\)" |rex field=Gateway2 "(?&lt;gw2&gt;\w+)\((?&lt;gw2_vendor&gt;\w+)\s(?&lt;gw2_region&gt;\S+)\)"|eval Peering_type=case(gw1_vendor=gw2_vendor AND gw1_region=gw2_region,"In-region",gw1_vendor=gw2_vendor,"Inter-region",true(),"Inter-Cloud")|table _time Gateway1 Gateway2 Latency Peering_type State</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="drilldown">cell</option>
         <format type="color" field="State">
           <colorPalette type="map">{"Down":#D93F3C,"Up":#65A637}</colorPalette>
+        </format>
+        <format type="number" field="Latency(sec)">
+          <option name="unit">sec</option>
+        </format>
+        <format type="number" field="Latency">
+          <option name="unit">ms</option>
         </format>
       </table>
     </panel>
   </row>
   <row>
     <panel>
+      <input type="time" token="tunneltime" searchWhenChanged="true">
+        <label></label>
+        <default>
+          <earliest>0</earliest>
+          <latest></latest>
+        </default>
+      </input>
       <chart>
-        <title>Tunnel Status history(1=Up 0=Down)</title>
+        <title>Tunnel Status History(1=Up 0=Down)</title>
         <search>
-          <query>`aviatrix_log` AviatrixTunnelStatusChange | eval State=if(new_state="Up",1,0) | eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | search Gateway1="$gateway1$" Gateway2="$gateway2$"|rex field=Gateway1 "(?&lt;gw1&gt;\w+)" |rex field=Gateway2 "(?&lt;gw2&gt;\w+)"|eval tunnel=gw1."&lt;-&gt;".gw2 | chart latest(State) as StateChange by _time,tunnel | makecontinuous span=1m | filldown</query>
-          <earliest>$earliest$</earliest>
-          <latest>$latest$</latest>
+          <query>`aviatrix_log` AviatrixTunnelStatusChange | eval State=if(new_state="Up",1,0) | eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | search Gateway1="$gateway1$" Gateway2="$gateway2$"|rex field=Gateway1 "(?&lt;gw1&gt;[^(]+)" |rex field=Gateway2 "(?&lt;gw2&gt;[^(]+)"|eval tunnel=gw1."&lt;-&gt;".gw2 | chart latest(State) as StateChange by _time,tunnel| makecontinuous span=1m | filldown</query>
+          <earliest>$tunneltime.earliest$</earliest>
+          <latest>$tunneltime.latest$</latest>
           <sampleRatio>1</sampleRatio>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
         <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
@@ -151,31 +167,13 @@
   <row>
     <panel>
       <table>
-        <title>VPN users (hh:mm:sec)</title>
+        <title>Active Opnvpn Users Reported</title>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession | eval secs=strptime(Logout,"%Y-%m-%d %H:%M:%S")-strptime(Login,"%Y-%m-%d %H:%M:%S") | stats sum(secs) as duration by User | eval Total_Time=floor(duration/3600).":".floor((duration/60)%60).":".floor(duration%60)| table User Total_Time |sort Total_Time desc</query>
+          <query>`aviatrix_log` AviatrixVPNSession | dedup Gateway, User  |  where Status="active" | rename Gateway as VPN_Gateway|table VPN_Gateway User</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
-        </search>
-        <option name="count">10</option>
-        <option name="dataOverlayMode">none</option>
-        <option name="drilldown">cell</option>
-        <option name="rowNumbers">false</option>
-        <option name="wrap">true</option>
-        <drilldown>
-          <link>
-            <![CDATA[search?q=`aviatrix_log` AviatrixVPNSession | search $click.name$=$click.value$ | where NOT Duration="N/A"]]>
-          </link>
-        </drilldown>
-      </table>
-    </panel>
-    <panel>
-      <table>
-        <title>Active VPN Sessions</title>
-        <search>
-          <query>`aviatrix_log` AviatrixVPNSession | dedup Gateway, User  |  where Status="active" | table Gateway User</query>
-          <earliest>$earliest$</earliest>
-          <latest>$latest$</latest>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
         </search>
       </table>
     </panel>
