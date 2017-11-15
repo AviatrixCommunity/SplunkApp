@@ -3,6 +3,7 @@
   <view name="gateway_overview" />
   <view name="vpn_overview" />
   <view name="security_overview" />
+  <view name="dependency_discovery" />
   <view name="search" />
   <view name="datasets" />
   <view name="reports" />
