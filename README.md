@@ -61,6 +61,12 @@ This dashboard analyses data specific to VPN sessions. By default, it shows char
 This dashboard shows data related to rules violations which can be filtered over gateway.
 ![Security](sample/splunk_security.png)
 
+### Dependency discovery
+
+This dashboard shows lets you see network flow to/from servers across the network, and can be used for dependency discovery post cloud migration using IPMotion. This dashboard needs ``Sankey Diagram - Custom Visualization`` Splunk app to be preinstalled on Splunk server for visualisation. For more details on this dashboard and setup instructions, click [here](http://docs.aviatrix.com/HowTos/ipmotion_dependency_discovery.html).
+
+![Dependency discovery](sample/splunk_dependency_discovery.png)
+
 ## Support
 Found a bug or need a feature?
   [Open an issue on github](https://github.com/AviatrixSystems/SplunkforAviatrix/issues)

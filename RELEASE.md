@@ -1,5 +1,11 @@
 # Release Notes
 
+## v1.4
+* Adding dependency discovery dashboard for IPMotion.
+
+## v1.3
+* New version required for Splunk app cloud and certification compliance.
+
 ## v1.2
 * Updated: Overview dashboard with tunnel status.
 * Updated: OpenVPN dashboard with VPN user session stats.
