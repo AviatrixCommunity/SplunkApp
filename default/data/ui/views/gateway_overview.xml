@@ -139,7 +139,7 @@
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| chart eval(round(avg(cpu_idle),2)) as Avg_CPU_idle_time(%) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| chart eval(round(avg(cpu_idle),2)) as Avg_CPU_idle_time(%25) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
@@ -177,7 +177,7 @@
         <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
         <option name="charting.legend.placement">bottom</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval disk_usage = 100*(disk_total-disk_free)/disk_total | chart eval(round(avg(disk_usage),2)) as Avg_disk_usage(%) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval disk_usage = 100*(disk_total-disk_free)/disk_total | chart eval(round(avg(disk_usage),2)) as Avg_disk_usage(%25) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
