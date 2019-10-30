@@ -18,7 +18,7 @@
       <fieldForLabel>Gateway</fieldForLabel>
       <fieldForValue>Gateway</fieldForValue>
       <search>
-        <query>`aviatrix_log` AviatrixFQDNRule | chart count by Gateway</query>
+        <query>`aviatrix_log` AviatrixFQDNRule* | chart count by Gateway</query>
         <earliest>$earliest$</earliest>
         <latest>$latest$</latest>
       </search>
@@ -65,7 +65,7 @@
         <option name="trellis.scales.shared">1</option>
         <option name="trellis.size">medium</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixFQDNRule* "state=MATCHED" | search Gateway=$gw_name$ | chart count by hostname&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixFQDNRule* NOT "drop_reason" | search Gateway=$gw_name$ | chart count by hostname&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
@@ -107,7 +107,7 @@
         <option name="trellis.scales.shared">1</option>
         <option name="trellis.size">medium</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixFQDNRule* "state=NO_MATCH"  | search Gateway=$gw_name$ | chart count by hostname&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixFQDNRule* "drop_reason"  | search Gateway=$gw_name$ | chart count by hostname&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
