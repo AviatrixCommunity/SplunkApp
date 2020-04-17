@@ -18,7 +18,7 @@
       <fieldForLabel>Gateway</fieldForLabel>
       <fieldForValue>Gateway</fieldForValue>
       <search>
-        <query>AvxRl earliest=$dependencytimer.earliest$ latest=$dependencytimer.latest$ | rex field=_raw "AvxRl\s(?&lt;Gateway&gt;([^\s]+))"| stats count by Gateway</query>
+        <query>`aviatrix_log` AvxRl earliest=$dependencytimer.earliest$ latest=$dependencytimer.latest$ | rex field=_raw "AvxRl\s(?&lt;Gateway&gt;([^\s]+))" | stats count by Gateway</query>
         <earliest>-24h@h</earliest>
         <latest>now</latest>
       </search>
@@ -48,7 +48,7 @@
     <panel>
       <viz type="sankey_diagram_app.sankey_diagram">
         <search>
-          <query>AvxRl $gw_name$ $src$ $dst$ $dpt$ |eval SourceIP=SRC|eval DestinationIP=DST|eval DestinationPort=if(isnotnull(DPT),DPT,"1")|stats count as Num_connections by SourceIP,DestinationIP,DestinationPort</query>
+          <query>`aviatrix_log` AvxRl $gw_name$ $src$ $dst$ $dpt$ | eval SourceIP=SRC | eval DestinationIP=DST | eval DestinationPort=if(isnotnull(DPT), DPT, "1") | stats count as Num_connections by SourceIP,DestinationIP,DestinationPort</query>
           <earliest>$dependencytimer.earliest$</earliest>
           <latest>$dependencytimer.latest$</latest>
           <refresh>5m</refresh>

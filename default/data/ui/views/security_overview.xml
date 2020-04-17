@@ -31,7 +31,7 @@
       <title>FQDN Accepted Domain Names</title>
       <chart>
         <search>
-          <query>`aviatrix_log` AviatrixFQDNRule* Gateway=$gw_name$ NOT "drop_reason"| chart count as Num_connections by hostname</query>
+          <query>`aviatrix_log` AviatrixFQDNRule* Gateway=$gw_name$ NOT "drop_reason" | chart count as Num_connections by hostname</query>
           <earliest>$securitytimer.earliest$</earliest>
           <latest>$securitytimer.latest$</latest>
           <sampleRatio>1</sampleRatio>
@@ -109,7 +109,7 @@
         <option name="trellis.scales.shared">1</option>
         <option name="trellis.size">medium</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixFQDNRule* "drop_reason"  | search Gateway=$gw_name$ | chart count by hostname&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixFQDNRule* "drop_reason" | search Gateway=$gw_name$ | chart count by hostname&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
@@ -125,7 +125,7 @@
         <fieldForLabel>Gateway</fieldForLabel>
         <fieldForValue>Gateway</fieldForValue>
         <search>
-          <query>AvxRl earliest=$securitytimer.earliest$ latest=$securitytimer.latest$ | rex field=_raw "AvxRl\s(?&lt;Gateway&gt;\w+)"| stats count by Gateway</query>
+          <query>`aviatrix_log` AvxRl earliest=$securitytimer.earliest$ latest=$securitytimer.latest$ | rex field=_raw "AvxRl\s(?&lt;Gateway&gt;\w+)" | stats count by Gateway</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>
@@ -150,7 +150,7 @@
       </input>
       <table>
         <search>
-          <query>AvxRl D: $src$ $dst$ $dpt$| rex field=_raw "AvxRl\s(?&lt;Gateway&gt;\w+)"|search $gw_name1$|eval SourceIP=SRC|eval DestinationIP=DST|eval DestinationPort=DPT |table _time Gateway SourceIP DestinationIP DestinationPort</query>
+          <query>`aviatrix_log` AvxRl D: $src$ $dst$ $dpt$ | rex field=_raw "AvxRl\s(?&lt;Gateway&gt;\w+)" | search $gw_name1$ | eval SourceIP=SRC | eval DestinationIP=DST | eval DestinationPort=DPT | table _time Gateway SourceIP DestinationIP DestinationPort</query>
           <earliest>$securitytimer.earliest$</earliest>
           <latest>$securitytimer.latest$</latest>
           <sampleRatio>1</sampleRatio>

@@ -5,7 +5,7 @@
     <panel>
       <single>
         <search>
-          <query>`aviatrix_log` AviatrixGwNetStats earliest=-5m@m|rename name as Gateway | stats dc(Gateway)</query>
+          <query>`aviatrix_log` AviatrixGwNetStats earliest=-5m@m | rename name as Gateway | stats dc(Gateway)</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
           <refresh>5m</refresh>
@@ -19,7 +19,7 @@
     <panel>
       <single>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession | dedup Gateway, User  |  where Status="active" | stats count</query>
+          <query>`aviatrix_log` AviatrixVPNSession | dedup Gateway, User | where Status="active" | stats count</query>
           <earliest>$tunneltimer.earliest$</earliest>
           <latest>$tunneltimer.latest$</latest>
           <refresh>5m</refresh>
@@ -34,7 +34,7 @@
     <panel>
       <single>
         <search>
-          <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 | where State="Up" | stats count</query>
+          <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State | eval temp=if(src_gw &gt; dst_gw, src_gw, dst_gw) | eval Gateway1=if(src_gw &lt; dst_gw, src_gw, dst_gw) | eval Gateway2=temp | dedup Gateway1, Gateway2 | where State="Up" | stats count</query>
           <earliest>$tunneltimer.earliest$</earliest>
           <latest>$tunneltimer.latest$</latest>
           <refresh>5m</refresh>
@@ -51,7 +51,7 @@
     <panel>
       <single>
         <search>
-          <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 | where State="Down" | stats count</query>
+          <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State | eval temp=if(src_gw &gt; dst_gw, src_gw, dst_gw) | eval Gateway1=if(src_gw &lt; dst_gw, src_gw, dst_gw) | eval Gateway2=temp | dedup Gateway1, Gateway2 | where State="Down" | stats count</query>
           <earliest>$tunneltimer.earliest$</earliest>
           <latest>$tunneltimer.latest$</latest>
           <refresh>5m</refresh>
@@ -79,7 +79,7 @@
       <chart>
         <title>Tunnel Status History(1=Up 0=Down)</title>
         <search>
-          <query>`aviatrix_log` AviatrixTunnelStatusChange | eval State=if(new_state="Up",1,0) | eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | search Gateway1="$gateway1$" Gateway2="$gateway2$"|rex field=Gateway1 "(?&lt;gw1&gt;[^(]+)" |rex field=Gateway2 "(?&lt;gw2&gt;[^(]+)"|eval tunnel=gw1."&lt;-&gt;".gw2 | chart latest(State) as StateChange by _time,tunnel| makecontinuous span=1m | filldown</query>
+          <query>`aviatrix_log` AviatrixTunnelStatusChange | eval State=if(new_state == "Up", 1, 0) | eval temp=if(src_gw &gt; dst_gw, src_gw, dst_gw) | eval Gateway1=if(src_gw &lt; dst_gw, src_gw, dst_gw) | eval Gateway2=temp | search Gateway1="$gateway1$" Gateway2="$gateway2$" | rex field=Gateway1 "(?&lt;gw1&gt;[^(]+)" | rex field=Gateway2 "(?&lt;gw2&gt;[^(]+)" | eval tunnel=gw1."&lt;-&gt;".gw2 | chart latest(State) as StateChange by _time,tunnel | makecontinuous span=1m | filldown</query>
           <earliest>$tunneltimer.earliest$</earliest>
           <latest>$tunneltimer.latest$</latest>
           <sampleRatio>1</sampleRatio>
@@ -125,7 +125,7 @@
         <choice value="*">All</choice>
         <fieldForLabel>Gateway1</fieldForLabel>
         <search>
-          <query>`aviatrix_log` AviatrixTunnelStatusChange earliest=$tunneltimer.earliest$ latest=$tunneltimer.latest$ | rename new_state as State| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 | where State="Up" or State="Down" | stats count by Gateway1</query>
+          <query>`aviatrix_log` AviatrixTunnelStatusChange earliest=$tunneltimer.earliest$ latest=$tunneltimer.latest$ | rename new_state as State | eval temp=if(src_gw &gt; dst_gw, src_gw, dst_gw) | eval Gateway1=if(src_gw &lt; dst_gw, src_gw, dst_gw) | eval Gateway2=temp | dedup Gateway1, Gateway2 | where State="Up" OR State="Down" | stats count by Gateway1</query>
           <earliest>-60m@m</earliest>
           <latest>now</latest>
         </search>
@@ -141,7 +141,7 @@
         <choice value="*">All</choice>
         <fieldForLabel>Gateway2</fieldForLabel>
         <search>
-          <query>`aviatrix_log` AviatrixTunnelStatusChange earliest=$tunneltimer.earliest$ latest=$tunneltimer.latest$ | rename new_state as State| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 |search Gateway1="$gateway1$"| where State="Up" OR State="Down" | stats count by Gateway2</query>
+          <query>`aviatrix_log` AviatrixTunnelStatusChange earliest=$tunneltimer.earliest$ latest=$tunneltimer.latest$ | rename new_state as State | eval temp=if(src_gw &gt; dst_gw, src_gw, dst_gw) | eval Gateway1=if(src_gw &lt; dst_gw, src_gw, dst_gw) | eval Gateway2=temp | dedup Gateway1, Gateway2 | search Gateway1="$gateway1$" | where State="Up" OR State="Down" | stats count by Gateway2</query>
           <earliest>-60m@m</earliest>
           <latest>now</latest>
         </search>
@@ -151,7 +151,7 @@
       </input>
       <table>
         <search>
-          <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State |eval Latency=round(latency,2)| eval temp = if (src_gw &gt;dst_gw,src_gw,dst_gw) | eval Gateway1 = if (src_gw&lt;dst_gw,src_gw, dst_gw) | eval Gateway2 = temp | dedup Gateway1, Gateway2 |where State="Up" or State="Down" |search Gateway1="$gateway1$" Gateway2="$gateway2$"|rex field=Gateway1 "(?&lt;gw1&gt;\w+)\((?&lt;gw1_vendor&gt;\w+)\s(?&lt;gw1_region&gt;\S+)\)" |rex field=Gateway2 "(?&lt;gw2&gt;\w+)\((?&lt;gw2_vendor&gt;\w+)\s(?&lt;gw2_region&gt;\S+)\)"|eval Peering_type=case(gw1_vendor=gw2_vendor AND gw1_region=gw2_region,"In-region",gw1_vendor=gw2_vendor,"Inter-region",true(),"Inter-Cloud")|table _time Gateway1 Gateway2 Latency Peering_type State</query>
+          <query>`aviatrix_log` AviatrixTunnelStatusChange | rename new_state as State | eval Latency=round(latency, 2) | eval temp=if(src_gw &gt; dst_gw, src_gw, dst_gw) | eval Gateway1=if(src_gw &lt; dst_gw, src_gw, dst_gw) | eval Gateway2=temp | dedup Gateway1, Gateway2 | where State="Up" OR State="Down" | search Gateway1="$gateway1$" Gateway2="$gateway2$" | rex field=Gateway1 "(?&lt;gw1&gt;\w+)\((?&lt;gw1_vendor&gt;\w+)\s(?&lt;gw1_region&gt;\S+)\)" | rex field=Gateway2 "(?&lt;gw2&gt;\w+)\((?&lt;gw2_vendor&gt;\w+)\s(?&lt;gw2_region&gt;\S+)\)" | eval Peering_type=case(gw1_vendor=gw2_vendor AND gw1_region=gw2_region,"In-region",gw1_vendor=gw2_vendor,"Inter-region",true(),"Inter-Cloud") | table _time Gateway1 Gateway2 Latency Peering_type State</query>
           <earliest>$tunneltimer.earliest$</earliest>
           <latest>$tunneltimer.latest$</latest>
           <refresh>5m</refresh>
@@ -176,7 +176,7 @@
       <table>
         <title>Active Opnvpn Users Reported</title>
         <search>
-          <query>`aviatrix_log` AviatrixVPNSession | dedup Gateway, User  |  where Status="active" | rename Gateway as VPN_Gateway|table VPN_Gateway User</query>
+          <query>`aviatrix_log` AviatrixVPNSession | dedup Gateway, User | where Status="active" | rename Gateway as VPN_Gateway | table VPN_Gateway User</query>
           <earliest>$tunneltimer.earliest$</earliest>
           <latest>$tunneltimer.latest$</latest>
           <refresh>5m</refresh>

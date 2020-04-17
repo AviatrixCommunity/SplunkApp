@@ -18,7 +18,7 @@
       <fieldForValue>Gateway</fieldForValue>
       <choice value="*">All</choice>
       <search>
-        <query>`aviatrix_log` AviatrixGwNetStats  earliest=$gatewaytimer.earliest$ latest=$gatewaytimer.latest$  |rename name as Gateway|stats count by Gateway |eval gateway_lower = lower(Gateway)| sort - gateway_lower desc</query>
+        <query>`aviatrix_log` AviatrixGwNetStats earliest=$gatewaytimer.earliest$ latest=$gatewaytimer.latest$ | rename name as Gateway | stats count by Gateway | eval gateway_lower = lower(Gateway) | sort - gateway_lower desc</query>
         <earliest>-24h@h</earliest>
         <latest>now</latest>
       </search>
@@ -34,7 +34,7 @@
       <chart>
         <title>Gateway Rx Rate(Mb/s)</title>
         <search>
-          <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_rx_rate "(?&lt;Value&gt;\d+\.\d+)(?&lt;Unit&gt;\w*)" | eval factor=case(Unit="Kb",0.00098,Unit="Mb",1,Unit="Gb",1024,Unit="Tb",1024*1024,true(),0) | eval total_rx_rate=Value*factor | timechart span=5m eval(round(avg(total_rx_rate),2)) as Avg_Rx_Rate(Mb/s) by Gateway useother=f</query>
+          <query>`aviatrix_log` AviatrixGwNetStats | rename name as Gateway | search Gateway=$gw_name$ | rex field=total_rx_rate "(?&lt;Value&gt;\d+\.\d+)(?&lt;Unit&gt;\w*)" | eval factor=case(Unit="Kb", 0.00098, Unit="Mb", 1, Unit="Gb", 1024, Unit="Tb", 1024*1024, true(), 0) | eval total_rx_rate=Value*factor | timechart span=5m eval(round(avg(total_rx_rate), 2)) as Avg_Rx_Rate(Mb/s) by Gateway useother=f</query>
           <earliest>$gatewaytimer.earliest$</earliest>
           <latest>$gatewaytimer.latest$</latest>
           <refresh>5m</refresh>
@@ -65,7 +65,7 @@
         <option name="charting.legend.placement">bottom</option>
         <option name="refresh.display">progressbar</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_rx_rate "(?&lt;total_rx_rate&gt;\d+\.\d+)Kb" | chart eval(round(avg(total_rx_rate),2)) as avg_rate by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixGwNetStats | rename name as Gateway | search Gateway=$gw_name$ | rex field=total_rx_rate "(?&lt;total_rx_rate&gt;\d+\.\d+)Kb" | chart eval(round(avg(total_rx_rate),2)) as avg_rate by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
@@ -73,7 +73,7 @@
       <chart>
         <title>Gateway Tx Rate(Mb/s)</title>
         <search>
-          <query>`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_tx_rate "(?&lt;Value&gt;\d+\.\d+)(?&lt;Unit&gt;\w*)" | eval factor=case(Unit="Kb",0.00098,Unit="Mb",1,Unit="Gb",1024,Unit="Tb",1024*1024,true(),0) | eval total_tx_rate=Value*factor | timechart span=5m eval(round(avg(total_tx_rate),2)) as Avg_Tx_Rate(Mb/s) by Gateway useother=f</query>
+          <query>`aviatrix_log` AviatrixGwNetStats | rename name as Gateway | search Gateway=$gw_name$ | rex field=total_tx_rate "(?&lt;Value&gt;\d+\.\d+)(?&lt;Unit&gt;\w*)" | eval factor=case(Unit="Kb", 0.00098, Unit="Mb", 1, Unit="Gb", 1024, Unit="Tb", 1024*1024, true(), 0) | eval total_tx_rate=Value*factor | timechart span=5m eval(round(avg(total_tx_rate), 2)) as Avg_Tx_Rate(Mb/s) by Gateway useother=f</query>
           <earliest>$gatewaytimer.earliest$</earliest>
           <latest>$gatewaytimer.latest$</latest>
           <refresh>5m</refresh>
@@ -104,7 +104,7 @@
         <option name="charting.legend.placement">bottom</option>
         <option name="refresh.display">progressbar</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixGwNetStats |rename name as Gateway| search Gateway=$gw_name$ | rex field=total_tx_rate "(?&lt;total_tx_rate&gt;\d+\.\d+)Kb" | chart eval(round(avg(total_tx_rate),2)) as Avg_Tx_Rate(Kb/s) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixGwNetStats | rename name as Gateway | search Gateway=$gw_name$ | rex field=total_tx_rate "(?&lt;total_tx_rate&gt;\d+\.\d+)Kb" | chart eval(round(avg(total_tx_rate), 2)) as Avg_Tx_Rate(Kb/s) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
@@ -114,7 +114,7 @@
       <chart>
         <title>Gateway CPU Utilization(%)</title>
         <search>
-          <query>`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval cpu_time=100-cpu_idle | timechart span=5m eval(round(avg(cpu_time),2)) as Avg_CPU_utilization(%) by Gateway  useother=f</query>
+          <query>`aviatrix_log` AviatrixGwSysStats | rename name as Gateway | search Gateway=$gw_name$ | eval cpu_time=100-cpu_idle | timechart span=5m eval(round(avg(cpu_time), 2)) as Avg_CPU_utilization(%) by Gateway useother=f</query>
           <earliest>$gatewaytimer.earliest$</earliest>
           <latest>$gatewaytimer.latest$</latest>
           <refresh>5m</refresh>
@@ -145,7 +145,7 @@
         <option name="charting.legend.placement">bottom</option>
         <option name="refresh.display">progressbar</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| chart eval(round(avg(cpu_idle),2)) as Avg_CPU_idle_time(%25) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats | rename name as Gateway | search Gateway=$gw_name$ | chart eval(round(avg(cpu_idle), 2)) as Avg_CPU_idle_time(%25) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
@@ -153,7 +153,7 @@
       <chart>
         <title>Gateway Disk Usage(%)</title>
         <search>
-          <query>`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval disk_usage = 100*(disk_total-disk_free)/disk_total | timechart span=5m eval(round(first(disk_usage),2)) as Disk_usage(%) by Gateway  useother=f</query>
+          <query>`aviatrix_log` AviatrixGwSysStats | rename name as Gateway | search Gateway=$gw_name$ | eval disk_usage = 100*(disk_total-disk_free)/disk_total | timechart span=5m eval(round(first(disk_usage), 2)) as Disk_usage(%) by Gateway useother=f</query>
           <earliest>$gatewaytimer.earliest$</earliest>
           <latest>$gatewaytimer.latest$</latest>
           <refresh>5m</refresh>
@@ -184,7 +184,7 @@
         <option name="charting.legend.placement">bottom</option>
         <option name="refresh.display">progressbar</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats |rename name as Gateway| search Gateway=$gw_name$| eval disk_usage = 100*(disk_total-disk_free)/disk_total | chart eval(round(avg(disk_usage),2)) as Avg_disk_usage(%25) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixGwSysStats | rename name as Gateway | search Gateway=$gw_name$ | eval disk_usage = 100*(disk_total-disk_free)/disk_total | chart eval(round(avg(disk_usage), 2)) as Avg_disk_usage(%25) by Gateway&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
