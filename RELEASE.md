@@ -1,5 +1,11 @@
 # Release Notes
 
+## v1.6
+* Updated: panels in dashboards now use shared timepickers.
+
+## v1.5
+* Fixed: FQDN searches showed no results in some cases.
+
 ## v1.4
 * Adding dependency discovery dashboard for IPMotion.
 
