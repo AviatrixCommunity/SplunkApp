@@ -3,6 +3,7 @@
 ## v1.6
 * Updated: panels in dashboards now use shared timepickers.
 * Fixed: security and dependency dashboards now use aviatrix_log macro globally.
+* Added: gateway overview dashboard now support multi-select
 
 ## v1.5
 * Fixed: FQDN searches showed no results in some cases.
