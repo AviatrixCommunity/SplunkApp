@@ -68,5 +68,4 @@ This dashboard shows lets you see network flow to/from servers across the networ
 ![Dependency discovery](sample/splunk_dependency_discovery.png)
 
 ## Support
-Found a bug or need a feature?
-  [Open an issue on github](https://github.com/AviatrixSystems/SplunkforAviatrix/issues)
+This repo is copyleft. All PRs are welcome. 
