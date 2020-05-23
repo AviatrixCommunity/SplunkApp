@@ -1,6 +1,5 @@
 # Aviatrix App for Splunk
 * **App Homepage:** https://splunkbase.splunk.com/app/3585/
-* **Authors:** Rakesh Ranjan
 * **App Version:** 1.6
 
 ## Description
