@@ -1,6 +1,4 @@
 # Aviatrix App for Splunk
-Copyright &copy; 2014-2020 Aviatrix Systems,Inc. All rights reserved.
-
 * **App Homepage:** https://splunkbase.splunk.com/app/3585/
 * **Authors:** Rakesh Ranjan
 * **App Version:** 1.6
@@ -68,4 +66,4 @@ This dashboard shows lets you see network flow to/from servers across the networ
 ![Dependency discovery](sample/splunk_dependency_discovery.png)
 
 ## Support
-This repo is copyleft. All PRs are welcome. 
+Email to support@aviatrix.com for questions. 
