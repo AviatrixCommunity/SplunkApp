@@ -1,9 +1,6 @@
 # Aviatrix App for Splunk
-Copyright &copy; 2014-2017 Aviatrix Systems,Inc. All rights reserved.
-
 * **App Homepage:** https://splunkbase.splunk.com/app/3585/
-* **Authors:** Rakesh Ranjan
-* **App Version:** 1.2
+* **App Version:** 1.6
 
 ## Description
 Aviatrix App for Splunk is an advanced reporting and analysis tool for Aviatrix cloud networking software. This app leverages Aviatrix controller and gateway logs and Splunk's search and visualization capabilities to provide monitoring and troubleshooting capabilities along with rapid insight and operational visibility for CloudOps and infrastructure engineers.
@@ -68,5 +65,4 @@ This dashboard shows lets you see network flow to/from servers across the networ
 ![Dependency discovery](sample/splunk_dependency_discovery.png)
 
 ## Support
-Found a bug or need a feature?
-  [Open an issue on github](https://github.com/AviatrixSystems/SplunkforAviatrix/issues)
+Email to support@aviatrix.com for questions. 

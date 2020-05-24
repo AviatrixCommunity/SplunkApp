@@ -18,7 +18,7 @@
       <fieldForLabel>Gateway</fieldForLabel>
       <fieldForValue>Gateway</fieldForValue>
       <search>
-        <query>`aviatrix_log` AviatrixFQDNRule | chart count by Gateway</query>
+        <query>`aviatrix_log` AviatrixFQDNRule* | chart count by Gateway</query>
         <earliest>$earliest$</earliest>
         <latest>$latest$</latest>
       </search>
@@ -31,7 +31,7 @@
       <title>FQDN Accepted Domain Names</title>
       <chart>
         <search>
-          <query>`aviatrix_log` AviatrixFQDNRule process_http() Gateway=$gw_name$ NOT "drop_reason"| chart count as Num_connections by hostname</query>
+          <query>`aviatrix_log` AviatrixFQDNRule* Gateway=$gw_name$ NOT "drop_reason"| chart count as Num_connections by hostname</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
           <sampleRatio>1</sampleRatio>
@@ -65,7 +65,7 @@
         <option name="trellis.scales.shared">1</option>
         <option name="trellis.size">medium</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixFQDNRule process_http() "state=MATCHED" | search Gateway=$gw_name$ | chart count by hostname&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixFQDNRule* NOT "drop_reason" | search Gateway=$gw_name$ | chart count by hostname&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
@@ -73,7 +73,7 @@
       <title>FQDN Blocked Domain Names</title>
       <chart>
         <search>
-          <query>`aviatrix_log` AviatrixFQDNRule process_http() "drop_reason" Gateway=$gw_name$ | chart count as Num_connections by hostname</query>
+          <query>`aviatrix_log` AviatrixFQDNRule* "drop_reason" Gateway=$gw_name$ | chart count as Num_connections by hostname</query>
           <earliest>$earliest$</earliest>
           <latest>$latest$</latest>
           <sampleRatio>1</sampleRatio>
@@ -107,7 +107,7 @@
         <option name="trellis.scales.shared">1</option>
         <option name="trellis.size">medium</option>
         <drilldown>
-          <link target="_blank">search?q=`aviatrix_log` AviatrixFQDNRule "state=NO_MATCH"  | search Gateway=$gw_name$ | chart count by hostname&amp;earliest=$earliest$&amp;latest=$latest$</link>
+          <link target="_blank">search?q=`aviatrix_log` AviatrixFQDNRule* "drop_reason"  | search Gateway=$gw_name$ | chart count by hostname&amp;earliest=$earliest$&amp;latest=$latest$</link>
         </drilldown>
       </chart>
     </panel>
