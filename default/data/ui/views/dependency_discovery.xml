@@ -2,11 +2,11 @@
   <label>Dependency discovery</label>
   <description>* Destination port 1 in visualisation means it's an L3 packet.</description>
   <fieldset autoRun="true" submitButton="false">
-    <input type="time" searchWhenChanged="true">
+    <input type="time" searchWhenChanged="true" token="dependencytimer">
       <label></label>
       <default>
-        <earliest>0</earliest>
-        <latest></latest>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
       </default>
       <change>
         <unset token="form.gw_name"></unset>
@@ -18,9 +18,9 @@
       <fieldForLabel>Gateway</fieldForLabel>
       <fieldForValue>Gateway</fieldForValue>
       <search>
-        <query>AvxRl | rex field=_raw "AvxRl\s(?&lt;Gateway&gt;([^\s]+))"| stats count by Gateway</query>
-        <earliest>$earliest$</earliest>
-        <latest>$latest$</latest>
+        <query>`aviatrix_log` AvxRl earliest=$dependencytimer.earliest$ latest=$dependencytimer.latest$ | rex field=_raw "AvxRl\s(?&lt;Gateway&gt;([^\s]+))" | stats count by Gateway</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
       </search>
       <default>*</default>
       <initialValue>*</initialValue>
@@ -48,14 +48,15 @@
     <panel>
       <viz type="sankey_diagram_app.sankey_diagram">
         <search>
-          <query>AvxRl $gw_name$ $src$ $dst$ $dpt$ |eval SourceIP=SRC|eval DestinationIP=DST|eval DestinationPort=if(isnotnull(DPT),DPT,"1")|stats count as Num_connections by SourceIP,DestinationIP,DestinationPort</query>
-          <earliest>$earliest$</earliest>
-          <latest>$latest$</latest>
+          <query>`aviatrix_log` AvxRl $gw_name$ $src$ $dst$ $dpt$ | eval SourceIP=SRC | eval DestinationIP=DST | eval DestinationPort=if(isnotnull(DPT), DPT, "1") | stats count as Num_connections by SourceIP,DestinationIP,DestinationPort</query>
+          <earliest>$dependencytimer.earliest$</earliest>
+          <latest>$dependencytimer.latest$</latest>
           <refresh>5m</refresh>
           <refreshType>delay</refreshType>
         </search>
         <option name="drilldown">none</option>
         <option name="height">929</option>
+        <option name="refresh.display">progressbar</option>
       </viz>
     </panel>
   </row>
