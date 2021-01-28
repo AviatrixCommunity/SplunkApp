@@ -5,7 +5,6 @@ import csv
 import sys
 import socket
 
-
 """ An adapter that takes CSV as input, performs a lookup to the operating
     system hostname resolution facilities, then returns the CSV results 
 
