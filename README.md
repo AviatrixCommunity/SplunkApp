@@ -1,6 +1,6 @@
 # Aviatrix App for Splunk
 * **App Homepage:** https://splunkbase.splunk.com/app/3585/
-* **App Version:** 1.6
+* **App Version:** 1.8
 
 ## Description
 Aviatrix App for Splunk is an advanced reporting and analysis tool for Aviatrix cloud networking software. This app leverages Aviatrix controller and gateway logs and Splunk's search and visualization capabilities to provide monitoring and troubleshooting capabilities along with rapid insight and operational visibility for CloudOps and infrastructure engineers.

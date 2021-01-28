@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import csv
 import sys
 import socket
+
 
 """ An adapter that takes CSV as input, performs a lookup to the operating
     system hostname resolution facilities, then returns the CSV results 
@@ -48,7 +50,7 @@ def rlookup(ip):
 
 def main():
     if len(sys.argv) != 3:
-        print "Usage: python external_lookup.py [host field] [ip field]"
+        print("Usage: python external_lookup.py [host field] [ip field]")
         sys.exit(1)
 
     ipfield = sys.argv[1]
