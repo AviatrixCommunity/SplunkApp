@@ -2,6 +2,7 @@
 import csv
 import sys
 import socket
+from __future__ import print_function
 
 #Based on etc/system/bin/external_lookup.py
 
@@ -22,7 +23,7 @@ def port_to_serv(dst_port):
 
 def main():
     if len(sys.argv) != 3:
-        print "Usage: python getServName.py [port field] [service name field]"
+        print("Usage: python getServName.py [port field] [service name field]")
         sys.exit(1)
 
     dst_port = sys.argv[1]
